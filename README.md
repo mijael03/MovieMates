@@ -1,36 +1,72 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MovieMate 🎬
 
-## Getting Started
+MovieMate is a project built to explore and learn about modern web development technologies. It serves as a social platform where users can **discover, review, and discuss movies**, while also acting as a hands-on learning experience for working with Next.js, Firebase, and state management solutions like Context API and Zustand.
 
-First, run the development server:
+## 📸 Project Preview
 
+![MovieMate Preview](public/moviemate.png)
+
+## 🔥 Features
+
+- Search and review movies 🎥
+- Trending and top-rated movie lists 🔝
+- User authentication 🔐 (via Firebase)
+- TMDb API integration for real-time movie data 📡
+- Responsive UI with Next.js & TailwindCSS ✨
+
+## 🛠 Tech Stack
+
+- **Frontend**: Next.js, React, TailwindCSS
+- **Backend**: Firebase Authentication
+- **Data Fetching**: React Query, TMDb API
+- **State Management**: Context API / Zustand
+
+## 🚀 Getting Started
+
+### 1️⃣ Clone the Repository
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/yourusername/moviemate.git
+cd moviemate
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2️⃣ Install Dependencies
+We use **pnpm** as the package manager (you can also use `npm` or `yarn`).
+```bash
+pnpm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 3️⃣ Set Up Environment Variables
+Create a `.env.local` file in the root directory and add the following:
+```env
+NEXT_PUBLIC_TMDB_API_KEY=your_tmdb_api_key
+NEXT_PUBLIC_FIREBASE_API_KEY=your_firebase_api_key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_firebase_auth_domain
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_firebase_project_id
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_firebase_storage_bucket
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_firebase_messaging_sender_id
+NEXT_PUBLIC_FIREBASE_APP_ID=your_firebase_app_id
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 4️⃣ Get Your TMDb API Key
+1. Go to [The Movie Database (TMDb)](https://www.themoviedb.org/)
+2. Sign up and go to **Account Settings > API**
+3. Generate an API key and paste it into `.env.local`
 
-## Learn More
+### 5️⃣ Set Up Firebase
+1. Go to [Firebase Console](https://console.firebase.google.com/)
+2. Create a new project
+3. Enable **Authentication** (Google, Email/Password, etc.)
+4. Copy your Firebase config and add it to `.env.local`
 
-To learn more about Next.js, take a look at the following resources:
+### 6️⃣ Run the Project
+```bash
+pnpm dev
+```
+Then open `http://localhost:3000` in your browser. 🚀
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📜 License
+This project is open-source under the MIT License.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 👥 Contributing
+Feel free to fork, submit issues, or create pull requests to improve MovieMate!
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
