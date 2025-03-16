@@ -1,5 +1,6 @@
 // lib/tmdb/client.ts
 import { Movie, MovieDetails, MovieResponse } from "../types/movie";
+import { VideoResponse } from "../types/video";
 
 const BASE_URL = "https://api.themoviedb.org/3";
 const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
@@ -93,4 +94,11 @@ export const getNowPlayingMovies = async (
   page: number = 1
 ): Promise<MovieResponse> => {
   return fetchTMDB<MovieResponse>("/movie/now_playing", { page });
+};
+
+// Obtener videos de una película (trailers, teasers, etc.)
+export const getMovieVideos = async (
+  movieId: number
+): Promise<VideoResponse> => {
+  return fetchTMDB<VideoResponse>(`/movie/${movieId}/videos`);
 };

@@ -25,12 +25,20 @@ function AvatarImage({
   className,
   ...props
 }: React.ComponentProps<typeof AvatarPrimitive.Image>) {
+  const [isLoading, setIsLoading] = React.useState(true);
+
   return (
-    <AvatarPrimitive.Image
-      data-slot="avatar-image"
-      className={cn("aspect-square size-full", className)}
-      {...props}
-    />
+    <>
+      {isLoading && (
+        <div className="absolute inset-0 bg-gray-600 animate-pulse rounded-full" />
+      )}
+      <AvatarPrimitive.Image
+        data-slot="avatar-image"
+        className={cn("aspect-square size-full", className)}
+        onLoad={() => setIsLoading(false)}
+        {...props}
+      />
+    </>
   )
 }
 

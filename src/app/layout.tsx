@@ -29,7 +29,7 @@ export default function RootLayout({
           <AuthProvider>
             <SearchModalWrapper>
               <Navbar />
-              <main className="flex-grow container mx-auto px-4 py-6">
+              <main className="flex-grow container mx-auto px-4 py-6 mt-20">
                 {children}
               </main>
               <Footer />
