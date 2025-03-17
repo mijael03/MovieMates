@@ -23,7 +23,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es">
+    <html lang="es" className="overflow-y-scroll" style={{ scrollbarGutter: 'stable' }}>
       <body className={`${inter.className} min-h-screen flex flex-col`}>
         <QueryProvider>
           <AuthProvider>
