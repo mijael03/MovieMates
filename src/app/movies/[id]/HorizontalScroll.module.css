@@ -1,0 +1,12 @@
+.scrollContainer {
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+  }
+  
+  /* Hide scrollbar for Chrome, Safari, and Edge */
+  .scrollContainer::-webkit-scrollbar {
+    display: none;
+  }
+  
