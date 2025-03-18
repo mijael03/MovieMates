@@ -7,7 +7,7 @@ import { useAuthStore } from "@/lib/store/authStore";
 import { signOut } from "@/lib/firebase/auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useSearchModalStore } from "@/lib/store/movieStore";
-import { Menu, Search, X } from "lucide-react";
+import { Menu, Search, X, EyeIcon } from "lucide-react";
 
 const Navbar = () => {
   const router = useRouter();
@@ -71,6 +71,12 @@ const Navbar = () => {
           >
             Películas
           </Link>
+          {user && (
+            <Link href="/watched-movies" className="hover:text-slate-300 transition-colors flex items-center gap-2">
+              <EyeIcon className="w-4 h-4" />
+              Películas Vistas
+            </Link>
+          )}
           <Button
             variant="ghost"
             onClick={handleOpenSearch}
@@ -123,6 +129,16 @@ const Navbar = () => {
                 >
                   Películas
                 </Link>
+                {user && (
+                  <Link
+                    href="/watched-movies"
+                    className="hover:text-slate-300 transition-colors py-2 flex items-center gap-2"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <EyeIcon className="w-4 h-4" />
+                    Películas Vistas
+                  </Link>
+                )}
                 <Button
                   variant="ghost"
                   onClick={() => {

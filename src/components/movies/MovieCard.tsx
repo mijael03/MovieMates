@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Movie } from "@/lib/types/movie";
 import { getImageUrl } from "@/lib/tmdb/client";
+import WatchedMovieButton from "./WatchedMovieButton";
 
 interface MovieCardProps {
   movie: Movie;
@@ -76,9 +77,14 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie }) => {
                 </svg>
                 <span className="text-lg">{movie.vote_average.toFixed(1)}</span>
               </div>
-              <button className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md transition-colors w-full">
-                Book Tour
-              </button>
+              <div className="flex flex-col gap-2 w-full">
+                <WatchedMovieButton
+                  movieId={movie.id}
+                  movieTitle={movie.title}
+                  variant="default"
+                  className="w-full"
+                />
+              </div>
             </div>
           </div>
         </Card>

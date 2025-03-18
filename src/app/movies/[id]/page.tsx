@@ -6,6 +6,7 @@ import { MovieReviewSection } from '@/components/movies/MovieReviewSection';
 import { MovieTrailer } from '@/components/movies/MovieTrailer';
 import MovieGrid from '@/components/movies/MovieGrid';
 import MovieCard from '@/components/movies/MovieCard';
+import WatchedMovieButton from '@/components/movies/WatchedMovieButton';
 
 export async function generateMetadata({ params }: { params: { id: string } }) {
   // Await the params object before accessing its properties
@@ -112,6 +113,16 @@ export default async function MoviePage({ params }: { params: { id: string } }) 
               <div className="mb-6">
                 <h3 className="text-lg font-semibold text-white mb-2">Sinopsis</h3>
                 <p className="text-gray-300">{movie.overview}</p>
+              </div>
+
+              <div className="mb-6">
+                <WatchedMovieButton
+                  movieId={movieId}
+                  movieTitle={movie.title}
+                  variant="default"
+                  size="lg"
+                  className="mt-2"
+                />
               </div>
             </div>
           </div>
