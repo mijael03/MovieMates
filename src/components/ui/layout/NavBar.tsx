@@ -7,7 +7,15 @@ import { useAuthStore } from "@/lib/store/authStore";
 import { signOut } from "@/lib/firebase/auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useSearchModalStore } from "@/lib/store/movieStore";
-import { Menu, Search, X, EyeIcon } from "lucide-react";
+import { Menu, Search, X, EyeIcon, LogOut, User } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Navbar = () => {
   const router = useRouter();
@@ -77,6 +85,45 @@ const Navbar = () => {
               Películas Vistas
             </Link>
           )}
+
+          {user ? (
+            <div className="flex items-center space-x-3">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Avatar className="h-8 w-8 cursor-pointer hover:ring-2 hover:ring-slate-600 transition-all">
+                    <AvatarImage
+                      src={user.photoURL || undefined}
+                      alt={user.displayName || "Usuario"}
+                    />
+                    <AvatarFallback>
+                      {user.displayName?.charAt(0) || "U"}
+                    </AvatarFallback>
+                  </Avatar>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="bg-slate-800 w-56" align="end">
+                  <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium leading-none">{user.displayName || "Usuario"}</p>
+                      <p className="text-xs leading-none text-slate-400">{user.email}</p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="cursor-pointer">
+                    <User className="mr-2 h-4 w-4" />
+                    <span>Perfil</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer text-red-500" onClick={handleLogout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Cerrar Sesión</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          ) : (
+            <Link href="/auth/login">
+              <Button variant="outline" className="px-4 py-1.5 border-slate-600 hover:bg-slate-700">Iniciar Sesión</Button>
+            </Link>
+          )}
           <Button
             variant="ghost"
             onClick={handleOpenSearch}
@@ -90,30 +137,6 @@ const Navbar = () => {
               <span className="px-1 py-0.5 bg-slate-600 rounded text-[10px]">K</span>
             </div>
           </Button>
-          <Link href="/chat" className="hover:text-slate-300 transition-colors">
-            Chat
-          </Link>
-
-          {user ? (
-            <div className="flex items-center space-x-3">
-              <Avatar className="h-8 w-8">
-                <AvatarImage
-                  src={user.photoURL || undefined}
-                  alt={user.displayName || "Usuario"}
-                />
-                <AvatarFallback>
-                  {user.displayName?.charAt(0) || "U"}
-                </AvatarFallback>
-              </Avatar>
-              <Button variant="ghost" onClick={handleLogout} className="px-4 py-1.5 hover:bg-slate-700">
-                Cerrar Sesión
-              </Button>
-            </div>
-          ) : (
-            <Link href="/auth/login">
-              <Button variant="outline" className="px-4 py-1.5 border-slate-600 hover:bg-slate-700">Iniciar Sesión</Button>
-            </Link>
-          )}
         </div>
 
         {/* Mobile Navigation */}
@@ -122,6 +145,17 @@ const Navbar = () => {
             <div className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-[40]" onClick={toggleMobileMenu}></div>
             <div className="md:hidden fixed top-20 left-0 right-0 bg-slate-800 shadow-lg z-[41] p-4 border-t border-slate-700">
               <div className="flex flex-col space-y-4">
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    handleOpenSearch();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-md px-4 py-3 flex items-center gap-2 border border-slate-600 w-full justify-start"
+                >
+                  <Search className="h-4 w-4" />
+                  Search
+                </Button>
                 <Link
                   href="/movies"
                   className="hover:text-slate-300 transition-colors py-2"
@@ -139,24 +173,6 @@ const Navbar = () => {
                     Películas Vistas
                   </Link>
                 )}
-                <Button
-                  variant="ghost"
-                  onClick={() => {
-                    handleOpenSearch();
-                    setMobileMenuOpen(false);
-                  }}
-                  className="bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-md px-4 py-3 flex items-center gap-2 border border-slate-600 w-full justify-start"
-                >
-                  <Search className="h-4 w-4" />
-                  Search
-                </Button>
-                <Link
-                  href="/chat"
-                  className="hover:text-slate-300 transition-colors py-2"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Chat
-                </Link>
 
                 {user ? (
                   <div className="flex flex-col space-y-3 pt-2 border-t border-slate-700">
@@ -178,8 +194,9 @@ const Navbar = () => {
                         handleLogout();
                         setMobileMenuOpen(false);
                       }}
-                      className="px-4 py-2 hover:bg-slate-700 w-full text-left"
+                      className="px-4 py-2 hover:bg-slate-700 w-full text-left flex items-center gap-2"
                     >
+                      <LogOut className="h-4 w-4" />
                       Cerrar Sesión
                     </Button>
                   </div>
@@ -191,6 +208,7 @@ const Navbar = () => {
                     <Button variant="outline" className="px-4 py-2 border-slate-600 hover:bg-slate-700 w-full">Iniciar Sesión</Button>
                   </Link>
                 )}
+
               </div>
             </div>
           </>

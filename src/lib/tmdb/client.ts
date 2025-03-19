@@ -51,14 +51,14 @@ const fetchTMDB = async <T>(
 export const getPopularMovies = async (
   page: number = 1
 ): Promise<MovieResponse> => {
-  return fetchTMDB<MovieResponse>("/movie/popular", { page });
+  return fetchTMDB<MovieResponse>("/movie/popular?include_adult=false&sort_by=popularity.desc", { page });
 };
 
 // Obtener películas populares (versión lite)
 export const getPopularMoviesLite = async (
   page: number = 1
 ): Promise<LiteMovieResponse> => {
-  const response = await fetchTMDB<MovieResponse>("/movie/popular", { page });
+  const response = await fetchTMDB<MovieResponse>("/movie/now_playing", { page });
   
   // Transform to lite version
   return {
