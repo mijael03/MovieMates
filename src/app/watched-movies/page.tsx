@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/lib/store/authStore';
 import { getWatchedMovies } from '@/lib/firebase/watchedMovies';
 import { getMovieDetails } from '@/lib/tmdb/client';
-import MovieCard from '@/components/movies/MovieCard';
+import LiteMovieCard from '@/components/movies/LiteMovieCard';
 import { Movie } from '@/lib/types/movie';
 
 export default function WatchedMoviesPage() {
@@ -66,18 +66,18 @@ export default function WatchedMoviesPage() {
                 <h1 className="text-4xl font-bold mb-8">Mis Películas Vistas</h1>
 
                 {loading ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                        {Array.from({ length: 8 }).map((_, index) => (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                        {Array.from({ length: 10 }).map((_, index) => (
                             <div
                                 key={index}
-                                className="bg-gray-800 h-96 rounded-lg animate-pulse"
+                                className="bg-gray-800 h-[380px] w-[220px] rounded-lg animate-pulse"
                             />
                         ))}
                     </div>
                 ) : movies.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                         {movies.map((movie) => (
-                            <MovieCard key={movie.id} movie={movie} />
+                            <LiteMovieCard key={movie.id} movie={movie} />
                         ))}
                     </div>
                 ) : (

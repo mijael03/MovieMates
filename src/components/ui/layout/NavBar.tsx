@@ -142,8 +142,7 @@ const Navbar = () => {
         {/* Mobile Navigation */}
         {mobileMenuOpen && (
           <>
-            <div className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-[40]" onClick={toggleMobileMenu}></div>
-            <div className="md:hidden fixed top-20 left-0 right-0 bg-slate-800 shadow-lg z-[41] p-4 border-t border-slate-700">
+            <div className="md:hidden  top-20 left-0 right-0 bg-slate-800 shadow-lg z-[41] p-4 border-t border-slate-700">
               <div className="flex flex-col space-y-4">
                 <Button
                   variant="ghost"

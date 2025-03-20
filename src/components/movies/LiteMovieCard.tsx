@@ -13,39 +13,40 @@ interface LiteMovieCardProps {
 
 const LiteMovieCard: React.FC<LiteMovieCardProps> = ({ movie }) => {
     const [imageLoading, setImageLoading] = useState(true);
-
     return (
-        <div className="relative group w-[220px] h-[380px] bg-gray-900 dark:bg-gray-800">
+        <div className="relative group w-[220px] h-[380px] bg-black rounded-xl">
             <Link href={`/movies/${movie.id}`}>
-                <Card className="overflow-hidden h-full w-full rounded-xl border-0 shadow-md transition-all duration-300 bg-gray-900 dark:bg-gray-800">
+                <Card className="overflow-hidden h-full w-full rounded-xl border-0 shadow-none p-0 m-0 bg-transparent transition-all duration-300">
                     {/* Card front - Image with overlay */}
-                    <div className="relative h-full w-full">
-                        {/* Static placeholder - always visible until image loads */}
-                        <div className="absolute inset-0 rounded-xl bg-gray-700 flex flex-col items-center justify-center p-4 text-center">
-                            <svg
-                                className="w-12 h-12 text-gray-500 mb-2"
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={1}
-                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                                />
-                            </svg>
-                            {/* Display movie title when image is loading or missing */}
-                            <h3 className="text-white font-medium text-sm">{movie.title}</h3>
-                        </div>
+                    <div className="relative h-full w-full p-0 m-0">
+                        {/* Static placeholder - only visible when image is loading */}
+                        {imageLoading && (
+                            <div className="absolute inset-0 rounded-xl flex flex-col items-center justify-center bg-black text-center z-10">
+                                <svg
+                                    className="w-12 h-12 text-gray-500 mb-2"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={1}
+                                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                    />
+                                </svg>
+                                {/* Display movie title when image is loading */}
+                                <h3 className="text-white font-medium text-sm">{movie.title}</h3>
+                            </div>
+                        )}
                         <Image
                             src={getImageUrl(movie.poster_path)}
                             alt={movie.title}
                             fill
                             style={{ objectFit: "cover" }}
                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                            className={`rounded-xl transition-opacity duration-300 ${imageLoading ? 'opacity-0' : 'opacity-100'}`}
+                            className={`rounded-xl transition-opacity duration-300 ${imageLoading ? 'opacity-0' : 'opacity-100'} object-cover w-full h-full`}
                             onLoad={() => setImageLoading(false)}
                         />
 
