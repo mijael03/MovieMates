@@ -4,11 +4,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { LiteMovie } from "@/lib/types/liteMovie";
+import { Movie } from "@/lib/types/movie";
 import { getImageUrl } from "@/lib/tmdb/client";
 import WatchedMovieButton from "./WatchedMovieButton";
 
 interface LiteMovieCardProps {
-    movie: LiteMovie;
+    movie: LiteMovie | Movie;
 }
 
 const LiteMovieCard: React.FC<LiteMovieCardProps> = ({ movie }) => {

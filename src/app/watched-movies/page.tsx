@@ -5,14 +5,19 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/lib/store/authStore';
 import { getWatchedMovies } from '@/lib/firebase/watchedMovies';
 import { getMovieDetails } from '@/lib/tmdb/client';
-import LiteMovieCard from '@/components/movies/LiteMovieCard';
 import { Movie } from '@/lib/types/movie';
+import { LiteMovie } from '@/lib/types/liteMovie';
+import PaginatedMovieGrid from '@/components/movies/PaginatedMovieGrid';
 
 export default function WatchedMoviesPage() {
     const { user } = useAuthStore();
     const router = useRouter();
-    const [movies, setMovies] = useState<Movie[]>([]);
+    const [allMovies, setAllMovies] = useState<Movie[]>([]);
     const [loading, setLoading] = useState(true);
+
+    // Pagination state
+    const [currentPage, setCurrentPage] = useState(1);
+    const moviesPerPage = 10;
 
     useEffect(() => {
         // Redirect if not logged in
@@ -41,7 +46,7 @@ export default function WatchedMoviesPage() {
 
                 const movieDetails = await Promise.all(moviePromises);
                 // Filter out any null results (failed fetches)
-                setMovies(movieDetails.filter(Boolean) as Movie[]);
+                setAllMovies(movieDetails.filter(Boolean) as Movie[]);
             } catch (error) {
                 console.error('Error fetching watched movies:', error);
             } finally {
@@ -51,6 +56,19 @@ export default function WatchedMoviesPage() {
 
         fetchWatchedMovies();
     }, [user, router, loading]);
+
+    // Get current movies for pagination
+    const indexOfLastMovie = currentPage * moviesPerPage;
+    const indexOfFirstMovie = indexOfLastMovie - moviesPerPage;
+    const currentMovies = allMovies.slice(indexOfFirstMovie, indexOfLastMovie);
+    const totalPages = Math.ceil(allMovies.length / moviesPerPage);
+
+    // Handle page change
+    const handlePageChange = (pageNumber: number) => {
+        setCurrentPage(pageNumber);
+        // Scroll to top when page changes
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
 
     if (!user) {
         return (
@@ -66,20 +84,20 @@ export default function WatchedMoviesPage() {
                 <h1 className="text-4xl font-bold mb-8">Mis Películas Vistas</h1>
 
                 {loading ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                        {Array.from({ length: 10 }).map((_, index) => (
-                            <div
-                                key={index}
-                                className="bg-gray-800 h-[380px] w-[220px] rounded-lg animate-pulse"
-                            />
-                        ))}
-                    </div>
-                ) : movies.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                        {movies.map((movie) => (
-                            <LiteMovieCard key={movie.id} movie={movie} />
-                        ))}
-                    </div>
+                    <PaginatedMovieGrid
+                        movies={[]}
+                        currentPage={1}
+                        totalPages={1}
+                        onPageChange={() => { }}
+                        isLoading={true}
+                    />
+                ) : allMovies.length > 0 ? (
+                    <PaginatedMovieGrid
+                        movies={currentMovies as LiteMovie[]}
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={handlePageChange}
+                    />
                 ) : (
                     <div className="text-center py-12">
                         <p className="text-xl text-gray-400 mb-4">
@@ -88,9 +106,10 @@ export default function WatchedMoviesPage() {
                         <p className="text-gray-500">
                             Explora películas y marca las que ya hayas visto para construir tu colección.
                         </p>
-                    </div>
-                )}
-            </div>
-        </div>
+                    </div >
+                )
+                }
+            </div >
+        </div >
     );
 }
