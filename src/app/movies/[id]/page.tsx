@@ -1,12 +1,14 @@
 import React from 'react';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import { getMovieDetails, getMovieVideos, getSimilarMovies, getImageUrl } from '@/lib/tmdb/client';
+import { getMovieDetails, getMovieVideos, getImageUrl } from '@/lib/tmdb/client';
+import { getSimilarMoviesLite } from '@/lib/tmdb/client-extension';
 import { MovieReviewSection } from '@/components/movies/MovieReviewSection';
 import { MovieTrailer } from '@/components/movies/MovieTrailer';
-import MovieGrid from '@/components/movies/MovieGrid';
-import MovieCard from '@/components/movies/MovieCard';
-
+import LiteMovieCard from '@/components/movies/LiteMovieCard';
+import WatchedMovieButton from '@/components/movies/WatchedMovieButton';
+import ScrollButtons from '@/components/movies/ScrollButtons';
+import styles from "./HorizontalScroll.module.css";
 export async function generateMetadata({ params }: { params: { id: string } }) {
   // Await the params object before accessing its properties
   const { id } = await params;
@@ -37,7 +39,7 @@ export default async function MoviePage({ params }: { params: { id: string } }) 
     const [movie, videos, similarMovies] = await Promise.all([
       getMovieDetails(movieId),
       getMovieVideos(movieId),
-      getSimilarMovies(movieId)
+      getSimilarMoviesLite(movieId)
     ]);
 
     // Find trailer
@@ -113,14 +115,24 @@ export default async function MoviePage({ params }: { params: { id: string } }) 
                 <h3 className="text-lg font-semibold text-white mb-2">Sinopsis</h3>
                 <p className="text-gray-300">{movie.overview}</p>
               </div>
+
+              <div className="mb-6">
+                <WatchedMovieButton
+                  movieId={movieId}
+                  movieTitle={movie.title}
+                  variant="default"
+                  size="lg"
+                  className="mt-2"
+                />
+              </div>
             </div>
           </div>
         </div>
 
         {/* Main content */}
-        <div className="container mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="container mx-auto px-4 grid grid-cols-1 gap-8">
           {/* Trailer section */}
-          <div className="lg:col-span-2">
+          <div>
             <h2 className="text-2xl font-bold text-white mb-4">Trailer</h2>
             <MovieTrailer trailer={trailer} title={movie.title} />
 
@@ -129,12 +141,20 @@ export default async function MoviePage({ params }: { params: { id: string } }) 
             </div>
           </div>
 
-          {/* Similar movies section */}
-          <div>
-            <h2 className="text-2xl font-bold text-white mb-4">Películas similares</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4">
-              {similarMovies.results.slice(0, 6).map((movie) => (
-                <MovieCard key={movie.id} movie={movie} />
+        </div>
+
+        {/* Similar movies section - Horizontal scrollable list at the bottom */}
+        <div className="container mx-auto px-4 mt-12 pb-8">
+          <h2 className="text-2xl font-bold text-white mb-6">Películas similares</h2>
+          <div className="relative">
+            <ScrollButtons containerId="similar-movies-container" />
+
+            {/* Scrollable container */}
+            <div id="similar-movies-container" className={`${styles.scrollContainer} flex overflow-x-auto pb-4 space-x-4 `} >
+              {similarMovies.results.slice(0, 10).map((movie) => (
+                <div key={movie.id} className="flex-shrink-0">
+                  <LiteMovieCard movie={movie} />
+                </div>
               ))}
             </div>
           </div>
