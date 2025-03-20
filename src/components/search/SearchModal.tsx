@@ -6,13 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Movie } from "@/lib/types/movie";
 import { searchMovies } from "@/lib/tmdb/client";
-import MovieCard from "@/components/movies/MovieCard";
+import LiteMovieCard from "@/components/movies/LiteMovieCard";
 import { useRouter } from "next/navigation";
-
+import { LiteMovie } from "@/lib/types/liteMovie";
 interface SearchModalProps {
-  popularMovies: Movie[];
-  topRatedMovies: Movie[];
-  upcomingMovies: Movie[];
+  popularMovies: Movie[] | LiteMovie[]
+  topRatedMovies: Movie[] | LiteMovie[]
+  upcomingMovies: Movie[] | LiteMovie[]
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
 }
@@ -27,7 +27,7 @@ const SearchModal: React.FC<SearchModalProps> = ({
   const router = useRouter();
   const [internalIsOpen, setInternalIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [localResults, setLocalResults] = useState<Movie[]>([]);
+  const [localResults, setLocalResults] = useState<Movie[] | LiteMovie[]>([]);
   const [isSearching, setIsSearching] = useState(false);
 
   // Use external state if provided, otherwise use internal state
@@ -80,11 +80,17 @@ const SearchModal: React.FC<SearchModalProps> = ({
     }
 
     const query = searchQuery.toLowerCase();
-    const filtered = uniqueLocalMovies.filter(
-      (movie) =>
-        movie.title.toLowerCase().includes(query) ||
-        (movie.overview && movie.overview.toLowerCase().includes(query))
-    );
+    const filtered = uniqueLocalMovies.filter((movie) => {
+      // Always search by title
+      const titleMatch = movie.title.toLowerCase().includes(query);
+
+      // Check if movie has overview property (Movie type) and search in it
+      const overviewMatch = 'overview' in movie &&
+        typeof movie.overview === 'string' &&
+        movie.overview.toLowerCase().includes(query);
+
+      return titleMatch || overviewMatch;
+    });
 
     setLocalResults(filtered.slice(0, 6)); // Limit to 6 results for better UI
   }, [searchQuery, uniqueLocalMovies]);
@@ -92,16 +98,15 @@ const SearchModal: React.FC<SearchModalProps> = ({
   // Handle search through API
   const handleSearchMore = async () => {
     if (!searchQuery.trim()) return;
-    
+
     setIsSearching(true);
     try {
       const results = await searchMovies(searchQuery);
-      // Navigate to a search results page or handle the results as needed
-      // For now, we'll just close the modal and log the results
       console.log("API search results:", results);
+
+      // Navigate to a search results page with the search query
       setIsOpen(false);
-      // Ideally, navigate to a search results page
-      // router.push(`/search?query=${encodeURIComponent(searchQuery)}`);
+      router.push(`/search?query=${encodeURIComponent(searchQuery)}`);
     } catch (error) {
       console.error("Error searching movies:", error);
     } finally {
@@ -115,8 +120,8 @@ const SearchModal: React.FC<SearchModalProps> = ({
   }, [isOpen]);
 
   return (
-    <Dialog 
-      open={isOpen} 
+    <Dialog
+      open={isOpen}
       onOpenChange={(newOpen) => {
         console.log("SearchModal: Dialog onOpenChange called with:", newOpen);
         setIsOpen(newOpen);
@@ -135,7 +140,7 @@ const SearchModal: React.FC<SearchModalProps> = ({
               autoFocus
             />
             {searchQuery.trim() && (
-              <Button 
+              <Button
                 className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-600 hover:bg-blue-700"
                 onClick={() => setSearchQuery("")}
               >
@@ -146,7 +151,7 @@ const SearchModal: React.FC<SearchModalProps> = ({
 
           {searchQuery.trim() && (
             <div className="mb-4">
-              <Button 
+              <Button
                 className="w-full bg-blue-600 hover:bg-blue-700 mb-4"
                 onClick={handleSearchMore}
                 disabled={isSearching}
@@ -157,13 +162,13 @@ const SearchModal: React.FC<SearchModalProps> = ({
           )}
 
           {localResults.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 justify-items-center">
               {localResults.map((movie) => (
                 <div key={movie.id} onClick={() => {
                   setIsOpen(false);
                   router.push(`/movies/${movie.id}`);
                 }}>
-                  <MovieCard movie={movie} />
+                  <LiteMovieCard movie={movie} />
                 </div>
               ))}
             </div>

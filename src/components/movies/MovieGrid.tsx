@@ -1,5 +1,5 @@
 import React from "react";
-import MovieCard from "./MovieCard";
+import LiteMovieCard from "./LiteMovieCard";
 import { Movie } from "@/lib/types/movie";
 
 interface MovieGridProps {
@@ -32,7 +32,7 @@ const MovieGrid: React.FC<MovieGridProps> = ({ movies, isLoading = false }) => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
       {movies.map((movie) => (
-        <MovieCard key={movie.id} movie={movie} />
+        <LiteMovieCard key={movie.id} movie={movie} />
       ))}
     </div>
   );
