@@ -1,0 +1,195 @@
+diff --git a/src/app/page.tsx b/src/app/page.tsx
+index cc6102f..8de6d42 100644
+--- a/src/app/page.tsx
++++ b/src/app/page.tsx
+@@ -1,144 +1,103 @@
+ 'use client';
+ 
+ import { Suspense, useEffect, useState } from "react";
+-import { getPopularMoviesLite, getTopRatedMoviesLite, getUpcomingMoviesLite } from "@/lib/tmdb/client";
+-import PaginatedMovieGrid from "@/components/movies/PaginatedMovieGrid";
++import { getPopularMovies, getPopularMoviesLite, getTopRatedMoviesLite, getUpcomingMoviesLite } from "@/lib/tmdb/client";
++import HorizontalMovieList from "@/components/movies/HorizontalMovieList";
++import HeroSection from "@/components/movies/HeroSection";
++import FeaturesSection from "@/components/home/FeaturesSection";
+ import { LiteMovieResponse } from "@/lib/types/liteMovie";
++import { Movie, MovieResponse } from "@/lib/types/movie";
+ 
+ export default function Page() {
+   // State for movie data
+   const [popularMoviesData, setPopularMoviesData] = useState<LiteMovieResponse | null>(null);
+   const [topRatedMoviesData, setTopRatedMoviesData] = useState<LiteMovieResponse | null>(null);
+   const [upcomingMoviesData, setUpcomingMoviesData] = useState<LiteMovieResponse | null>(null);
++  const [featuredMovie, setFeaturedMovie] = useState<Movie | null>(null);
+ 
+-  // Separate loading states for each section
++  // Loading states
+   const [popularLoading, setPopularLoading] = useState(true);
+   const [topRatedLoading, setTopRatedLoading] = useState(true);
+   const [upcomingLoading, setUpcomingLoading] = useState(true);
++  const [featuredLoading, setFeaturedLoading] = useState(true);
+ 
+-  // Pagination state
+-  const [popularPage, setPopularPage] = useState(1);
+-  const [topRatedPage, setTopRatedPage] = useState(1);
+-  const [upcomingPage, setUpcomingPage] = useState(1);
++  // Fetch featured movie (most popular movie with backdrop)
++  const fetchFeaturedMovie = async () => {
++    setFeaturedLoading(true);
++    try {
++      const response = await getPopularMovies();
++      // Find the first movie with a backdrop path
++      const movieWithBackdrop = response.results.find(movie => movie.backdrop_path);
++      setFeaturedMovie(movieWithBackdrop || response.results[0]);
++    } catch (error) {
++      console.error("Error fetching featured movie:", error);
++    } finally {
++      setFeaturedLoading(false);
++    }
++  };
+ 
+-  // Define fetch functions outside useEffect so they can be passed as props
+-  const fetchPopularMovies = async (): Promise<LiteMovieResponse> => {
++  // Fetch popular movies
++  const fetchPopularMovies = async () => {
+     setPopularLoading(true);
+     try {
+-      const popular = await getPopularMoviesLite(popularPage);
++      const popular = await getPopularMoviesLite();
+       setPopularMoviesData(popular);
+-      return popular;
+     } catch (error) {
+       console.error("Error fetching popular movies:", error);
+-      throw error;
+     } finally {
+       setPopularLoading(false);
+     }
+   };
+ 
+-  const fetchTopRatedMovies = async (): Promise<LiteMovieResponse> => {
++  // Fetch top rated movies
++  const fetchTopRatedMovies = async () => {
+     setTopRatedLoading(true);
+     try {
+-      const topRated = await getTopRatedMoviesLite(topRatedPage);
++      const topRated = await getTopRatedMoviesLite();
+       setTopRatedMoviesData(topRated);
+-      return topRated;
+     } catch (error) {
+       console.error("Error fetching top rated movies:", error);
+-      throw error;
+     } finally {
+       setTopRatedLoading(false);
+     }
+   };
+ 
+-  const fetchUpcomingMovies = async (): Promise<LiteMovieResponse> => {
++  // Fetch upcoming movies
++  const fetchUpcomingMovies = async () => {
+     setUpcomingLoading(true);
+     try {
+-      const upcoming = await getUpcomingMoviesLite(upcomingPage);
++      const upcoming = await getUpcomingMoviesLite();
+       setUpcomingMoviesData(upcoming);
+-      return upcoming;
+     } catch (error) {
+       console.error("Error fetching upcoming movies:", error);
+-      throw error;
+     } finally {
+       setUpcomingLoading(false);
+     }
+   };
+ 
+-  // Fetch popular movies
++  // Fetch all movie data on component mount
+   useEffect(() => {
++    fetchFeaturedMovie();
+     fetchPopularMovies();
+-  }, [popularPage]);
+-
+-  // Fetch top rated movies
+-  useEffect(() => {
+     fetchTopRatedMovies();
+-  }, [topRatedPage]);
+-
+-  // Fetch upcoming movies
+-  useEffect(() => {
+     fetchUpcomingMovies();
+-  }, [upcomingPage]);
++  }, []);
+ 
+   return (
+-    <div className="min-h-screen w-full bg-gray-900 dark:bg-gray-800 px-4 py-8">
+-      <header className="mb-12 text-center container mx-auto">
+-        <div className="flex justify-center mb-4">
+-          <img
+-            src="/moviemate.png"
+-            alt="MovieMate Logo"
+-            className="h-56 w-auto object-contain transform hover:scale-105 transition-transform duration-300"
+-          />
+-        </div>
+-        <h1 className="text-4xl font-bold mb-2 text-white">MovieMates</h1>
+-        <p className="text-gray-400">Discover and track your favorite movies</p>
+-      </header>
+-
+-      <main className="space-y-12 container mx-auto">
+-        <section>
+-          <div className="flex justify-between items-center mb-6">
+-            <h2 className="text-2xl font-semibold text-white">Popular Movies</h2>
+-          </div>
+-          <PaginatedMovieGrid
+-            movies={popularMoviesData?.results || []}
+-            currentPage={popularPage}
+-            totalPages={popularMoviesData?.total_pages || 1}
+-            onPageChange={setPopularPage}
+-            queryKey="popularMovies"
+-            queryFn={fetchPopularMovies}
+-            isLoading={popularLoading}
+-          />
+-        </section>
++    <div className="min-h-screen w-full bg-gray-900">
++      {/* Hero Section with Featured Movie */}
++      <HeroSection movie={featuredMovie} isLoading={featuredLoading} />
+ 
+-        <section>
+-          <div className="flex justify-between items-center mb-6">
+-            <h2 className="text-2xl font-semibold text-white">Top Rated</h2>
+-          </div>
+-          <PaginatedMovieGrid
+-            movies={topRatedMoviesData?.results || []}
+-            currentPage={topRatedPage}
+-            totalPages={topRatedMoviesData?.total_pages || 1}
+-            onPageChange={setTopRatedPage}
+-            queryKey="topRatedMovies"
+-            queryFn={fetchTopRatedMovies}
+-            isLoading={topRatedLoading}
+-          />
+-        </section>
++      {/* Popular Movies Section */}
++      <div className="container mx-auto px-6 py-16">
++        <HorizontalMovieList
++          movies={popularMoviesData?.results || []}
++          isLoading={popularLoading}
++        />
++      </div>
+ 
+-        <section>
+-          <div className="flex justify-between items-center mb-6">
+-            <h2 className="text-2xl font-semibold text-white">Upcoming Releases</h2>
+-          </div>
+-          <PaginatedMovieGrid
+-            movies={upcomingMoviesData?.results || []}
+-            currentPage={upcomingPage}
+-            totalPages={upcomingMoviesData?.total_pages || 1}
+-            onPageChange={setUpcomingPage}
+-            queryKey="upcomingMovies"
+-            queryFn={fetchUpcomingMovies}
+-            isLoading={upcomingLoading}
+-          />
+-        </section>
+-      </main>
++      {/* Features Section */}
++      <FeaturesSection />
+     </div>
+   );
+ }
