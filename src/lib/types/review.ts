@@ -8,4 +8,8 @@ export interface MovieReview {
   rating: number;
   content: string;
   createdAt: any;
+  // Campos adicionales para mostrar en la lista de comentarios recientes
+  movieTitle?: string;
+  movieYear?: number;
+  posterPath?: string;
 }

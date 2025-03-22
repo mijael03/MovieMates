@@ -8,13 +8,16 @@ import { Textarea } from '@/components/ui/textarea';
 import { StarIcon } from '@/components/ui/star-icon';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Link from 'next/link';
+import ReviewCard from './ReviewCard';
 
 interface MovieReviewSectionProps {
   movieId: number;
   movieTitle: string;
+  movieYear?: number;
+  posterPath?: string | null;
 }
 
-export const MovieReviewSection: React.FC<MovieReviewSectionProps> = ({ movieId, movieTitle }) => {
+export const MovieReviewSection: React.FC<MovieReviewSectionProps> = ({ movieId, movieTitle, movieYear, posterPath }) => {
   const { user } = useAuthStore();
   const [reviews, setReviews] = useState<MovieReview[]>([]);
   const [newReview, setNewReview] = useState('');
@@ -51,7 +54,16 @@ export const MovieReviewSection: React.FC<MovieReviewSectionProps> = ({ movieId,
 
     setIsSubmitting(true);
     try {
-      await addReview(movieId, user, newReview, rating);
+      // Obtener información de la película desde props
+      await addReview(
+        movieId,
+        user,
+        newReview,
+        rating,
+        movieTitle, // Título de la película
+        movieYear || new Date().getFullYear(), // Usar el año proporcionado o el actual como fallback
+        posterPath // Usar el poster path proporcionado
+      );
       setNewReview('');
       setRating(5);
     } catch (error) {
@@ -189,25 +201,9 @@ export const MovieReviewSection: React.FC<MovieReviewSectionProps> = ({ movieId,
           <p className="text-gray-400 text-center py-4">No hay reseñas para esta película. ¡Sé el primero en opinar!</p>
         ) : (
           reviews.map((review) => (
-            <div key={review.id} className="bg-gray-700 rounded-lg p-4 shadow">
-              <div className="flex justify-between items-start mb-3">
-                <div className="flex items-center">
-                  <Avatar className="h-10 w-10 mr-3">
-                    <AvatarImage src={review.photoURL || undefined} alt={review.displayName} />
-                    <AvatarFallback>{review.displayName.charAt(0)}</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <h4 className="font-semibold text-white">{review.displayName}</h4>
-                    <p className="text-xs text-gray-400">
-                      {review.createdAt?.toDate().toLocaleDateString()}
-                    </p>
-                  </div>
-                </div>
-                <StarRating value={review.rating} />
-              </div>
-
+            <div key={review.id}>
               {editingReview === review.id ? (
-                <div className="mt-3">
+                <div className="bg-gray-700 rounded-lg p-4 shadow mt-3">
                   <div className="mb-3">
                     <label className="block text-sm font-medium text-gray-300 mb-2">
                       Editar calificación
@@ -243,10 +239,14 @@ export const MovieReviewSection: React.FC<MovieReviewSectionProps> = ({ movieId,
                 </div>
               ) : (
                 <>
-                  <p className="text-gray-200 mt-2">{review.content}</p>
+                  <ReviewCard
+                    review={review}
+                    showMovieInfo={false}
+                    className="mb-2"
+                  />
 
                   {user && user.uid === review.userId && (
-                    <div className="mt-3 flex space-x-2">
+                    <div className="mt-2 mb-4 flex space-x-2">
                       <Button
                         onClick={() => handleStartEdit(review)}
                         variant="outline"

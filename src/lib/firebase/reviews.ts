@@ -10,6 +10,7 @@ import {
   deleteDoc,
   doc,
   updateDoc,
+  limit,
 } from "firebase/firestore";
 import { db } from "./config";
 import { MovieReview } from "../types/review";
@@ -20,17 +21,24 @@ export const addReview = async (
   movieId: number,
   user: User,
   content: string,
-  rating: number
+  rating: number,
+  movieTitle?: string,
+  movieYear?: number,
+  posterPath?: string | null
 ): Promise<string> => {
   try {
     const reviewRef = await addDoc(collection(db, "reviews"), {
       movieId,
       userId: user.uid,
-      displayName: user.displayName,
+      displayName: user.displayName || "Usuario",
       photoURL: user.photoURL,
-      content,
       rating,
+      content,
       createdAt: serverTimestamp(),
+      // Información adicional de la película
+      movieTitle,
+      movieYear,
+      posterPath,
     });
 
     return reviewRef.id;
@@ -45,15 +53,18 @@ export const getMovieReviews = (
   movieId: number,
   callback: (reviews: MovieReview[]) => void
 ) => {
-  const q = query(
-    collection(db, "reviews"),
-    where("movieId", "==", movieId),
-    orderBy("createdAt", "desc")
-  );
+  // Si movieId es 0, obtenemos todos los comentarios (para la página principal)
+  const q = movieId === 0
+    ? query(collection(db, "reviews"), orderBy("createdAt", "desc"), limit(10))
+    : query(
+        collection(db, "reviews"),
+        where("movieId", "==", movieId),
+        orderBy("createdAt", "desc")
+      );
 
   return onSnapshot(
     q,
-    (snapshot) => {
+    async (snapshot) => {
       const reviews = snapshot.docs.map(
         (doc) =>
           ({
@@ -62,7 +73,13 @@ export const getMovieReviews = (
           } as MovieReview)
       );
 
-      callback(reviews);
+      // Import the utility function only when needed to avoid circular dependencies
+      const { fillMissingMovieInfoBatch } = await import("../utils/movieUtils");
+      
+      // Fill missing movie information for all reviews
+      const filledReviews = await fillMissingMovieInfoBatch(reviews);
+      
+      callback(filledReviews);
     },
     (error) => {
       console.error("Error al obtener reseñas:", error);

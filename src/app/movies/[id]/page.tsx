@@ -137,7 +137,12 @@ export default async function MoviePage({ params }: { params: { id: string } }) 
             <MovieTrailer trailer={trailer} title={movie.title} />
 
             <div className="mt-12">
-              <MovieReviewSection movieId={movieId} movieTitle={movie.title} />
+              <MovieReviewSection
+                movieId={movieId}
+                movieTitle={movie.title}
+                movieYear={new Date(movie.release_date).getFullYear()}
+                posterPath={movie.poster_path}
+              />
             </div>
           </div>
 

@@ -21,31 +21,37 @@ export default function Page() {
   const [upcomingLoading, setUpcomingLoading] = useState(true);
   const [featuredLoading, setFeaturedLoading] = useState(true);
 
-  // Fetch featured movie (most popular movie with backdrop)
-  const fetchFeaturedMovie = async () => {
-    setFeaturedLoading(true);
-    try {
-      const response = await getPopularMovies();
-      // Find the first movie with a backdrop path
-      const movieWithBackdrop = response.results.find(movie => movie.backdrop_path);
-      setFeaturedMovie(movieWithBackdrop || response.results[0]);
-    } catch (error) {
-      console.error("Error fetching featured movie:", error);
-    } finally {
-      setFeaturedLoading(false);
-    }
-  };
-
-  // Fetch popular movies
+  // Fetch popular movies and extract featured movie from the same data
   const fetchPopularMovies = async () => {
     setPopularLoading(true);
+    setFeaturedLoading(true);
     try {
-      const popular = await getPopularMoviesLite();
-      setPopularMoviesData(popular);
+      // Fetch full movie data for featured movie selection
+      const response = await getPopularMovies();
+
+      // Find the first movie with a backdrop path for the featured movie
+      const movieWithBackdrop = response.results.find(movie => movie.backdrop_path);
+      setFeaturedMovie(movieWithBackdrop || response.results[0]);
+
+      // Transform to lite version for the horizontal list
+      const popularLite: LiteMovieResponse = {
+        page: response.page,
+        results: response.results.map(movie => ({
+          id: movie.id,
+          title: movie.title,
+          poster_path: movie.poster_path,
+          vote_average: movie.vote_average
+        })),
+        total_pages: response.total_pages,
+        total_results: response.total_results
+      };
+
+      setPopularMoviesData(popularLite);
     } catch (error) {
       console.error("Error fetching popular movies:", error);
     } finally {
       setPopularLoading(false);
+      setFeaturedLoading(false);
     }
   };
 
@@ -77,7 +83,6 @@ export default function Page() {
 
   // Fetch all movie data on component mount
   useEffect(() => {
-    fetchFeaturedMovie();
     fetchPopularMovies();
     fetchTopRatedMovies();
     fetchUpcomingMovies();

@@ -43,10 +43,10 @@ const HeroSection: React.FC<HeroSectionProps> = ({ movie, isLoading = false }) =
             <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-transparent via-15% to-transparent"></div>
             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent via-85% to-gray-900"></div>
 
-            {/* Movie info - positioned vertically on the side */}
-            <div className="absolute right-5 top-1/2 -translate-y-1/2 z-10 flex flex-col items-end">
+            {/* Movie info - positioned vertically in the bottom corner */}
+            <div className="absolute right-5 bottom-10 z-5 flex flex-col items-end">
                 <Link href={`/movies/${movie.id}`}>
-                    <div className="vertical-text text-sm font-bold text-gray-400 tracking-tight hover:text-gray-300 transition-colors writing-mode-vertical">
+                    <div className="vertical-text text-sm font-bold text-gray-400 tracking-tight hover:text-gray-300 transition-colors writing-mode-vertical ">
                         {movie.title} - {releaseYear}
                     </div>
                 </Link>
